@@ -863,10 +863,6 @@
     parent.appendChild(rect);
     this.__currentElement = rect;
     this.__applyStyleToCurrentElement("stroke");
-    this.__applyStyleToCurrentElement("shadowColor");
-    this.__applyStyleToCurrentElement("shadowOffsetX");
-    this.__applyStyleToCurrentElement("shadowOffsetY");
-    this.__applyStyleToCurrentElement("shadowBlur");
   };
 
 
