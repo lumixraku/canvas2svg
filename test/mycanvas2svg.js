@@ -1233,7 +1233,7 @@
     this.__transformElement.setAttribute("transform", format("matrix({a},{b},{c},{d},{e},{f})", { a: a, b: b, c: c, d: d, e: e, f: f }));
     group.appendChild(newGroup);
     this.__currentElement = newGroup;
-    this.beginPath();
+    // this.beginPath();
   };
   ctx.prototype.getTransform = function () {
     // matrix(1,0,0,1,0,0)
