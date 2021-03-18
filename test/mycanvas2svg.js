@@ -1221,9 +1221,12 @@
     ctx.prototype.globalCompositeOperation = function () { };
   
     ctx.prototype.setTransform = function (a,b,c,d,e,f) {
-      this.__transformElement = this.__currentElement;
-      this.__transformElement.setAttribute("transform", "")
-      this.__addTransform(format("matrix({a},{b},{c},{d},{e},{f})", { a: a, b: b, c: c, d: d, e: e, f: f }));
+      var group = this.__closestGroupOrSvg();
+      var newGroup = this.__createElement("g");
+      this.__transformElement = newGroup;
+      this.__transformElement.setAttribute("transform", format("matrix({a},{b},{c},{d},{e},{f})", { a: a, b: b, c: c, d: d, e: e, f: f }));
+      group.appendChild(newGroup);
+      this.__currentElement = newGroup;
     };
     ctx.prototype.getTransform = function () {
       // matrix(1,0,0,1,0,0)
