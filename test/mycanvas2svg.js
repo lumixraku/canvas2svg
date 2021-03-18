@@ -1068,10 +1068,6 @@
         id = randomString(this.__ids),
         newGroup = this.__createElement("g");
   
-      // 似乎从作者意图看 clip 的时候  currentElement 不可以是 g 元素
-      // 不然 group.removeChild 会报错
-      // 但是我确实遇到了 clip 时当前元素是 g
-      // 当我设置 Horizontal skewing 为 number 类型就会这样 诡异！！
       if (this.__currentElement.nodeName === "ggg") {
         group = this.__closestGroupOrSvg(this.__currentElement.parentNode);
       }
