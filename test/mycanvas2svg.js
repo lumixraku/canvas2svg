@@ -151,16 +151,28 @@
       canvas: "10px sans-serif"
     },
     "shadowColor": {
-      canvas: "#000000"
+      canvas: "#000000",
+      svg:"",
+      svgAttr: "shadow-color",
+      apply: "shadow-color"
     },
     "shadowOffsetX": {
-      canvas: 0
+      canvas: 0,
+      svg:0,
+      svgAttr: "shadow-offsetX",
+      apply: "shadow-offsetX"
     },
     "shadowOffsetY": {
-      canvas: 0
+      canvas: 0,
+      svg:0,
+      svgAttr: "shadow-offsetY",
+      apply: "shadow-offsetY"
     },
     "shadowBlur": {
-      canvas: 0
+      canvas: 0,
+      svgAttr: "shadow-blur",
+      svg:0,
+      apply: "shadow-blur"
     },
     "textAlign": {
       canvas: "start"
@@ -359,12 +371,15 @@
         node.setAttribute(type, "");
       })
     }
-
+    var createShadow = false;
     var keys = Object.keys(STYLES), i, style, value, id, regex, matches;
     for (i = 0; i < keys.length; i++) {
       style = STYLES[keys[i]];
       value = this[keys[i]];
       if (style.apply) {
+        if (style.apply.indexOf('shadow-') !== -1) {
+          // debugger;
+        }
         //is this a gradient or pattern?
         if (value instanceof CanvasPattern) {
           //pattern
@@ -406,8 +421,27 @@
             //otherwise only update attribute if right type, and not svg default
             currentElement.setAttribute(attr, value);
           }
+        } else if (style.apply.indexOf('shadow-') !== -1) {
+          if (style.apply === 'shadow-blur') value = +value / 2;
+          currentElement.setAttribute(style.svgAttr, value);          
+          createShadow = true;
         }
       }
+    }
+
+    // create filter
+    if (createShadow) {
+      let filter = this.__createElement("filter");
+      let id = randomString(this.__ids);
+      filter.setAttribute("id", id);
+      let feDropShadow = this.__createElement("feDropShadow");
+      feDropShadow.setAttribute("dx", currentElement.getAttribute("shadow-offsetX"));
+      feDropShadow.setAttribute("dy", currentElement.getAttribute("shadow-offsetY"));
+      feDropShadow.setAttribute("stdDeviation", currentElement.getAttribute("shadow-blur"));
+      feDropShadow.setAttribute("flood-color", currentElement.getAttribute("shadow-color"));
+      filter.appendChild(feDropShadow);
+      this.__defs.appendChild(filter);
+      currentElement.setAttribute("filter", format("url(#{id})", { id: id }))
     }
   };
 
@@ -417,7 +451,6 @@
    */
   ctx.prototype.__closestGroupOrSvg = function (node) {
     node = node || this.__currentElement;
-    console.log('__closestGroupOrSvg current', this.__currentElement);
     if (node.nodeName === "g" || node.nodeName === "svg") {
       return node;
     } else {
@@ -528,7 +561,6 @@
       transform = "";
     }
     transform += t;
-    console.log('addTransform', transform, this.__currentElement,);
     this.__currentElement.setAttribute("transform", transform);
   };
 
@@ -831,6 +863,10 @@
     parent.appendChild(rect);
     this.__currentElement = rect;
     this.__applyStyleToCurrentElement("stroke");
+    this.__applyStyleToCurrentElement("shadowColor");
+    this.__applyStyleToCurrentElement("shadowOffsetX");
+    this.__applyStyleToCurrentElement("shadowOffsetY");
+    this.__applyStyleToCurrentElement("shadowBlur");
   };
 
 
@@ -1065,7 +1101,6 @@
    * http://tutorials.jenkov.com/svg/clip-path.html
    */
   ctx.prototype.clip = function () {
-    console.log('clipcurr', this.__currentElement);
     if (this.__currentElement.nodeName === "g") {
       let path = this.__createElement("path", {}, true);
       parent = this.__closestGroupOrSvg();
@@ -1238,7 +1273,6 @@
   ctx.prototype.getTransform = function () {
     // matrix(1,0,0,1,0,0)
     var transform = (this.__transformElement.getAttribute("transform") || "").trim();
-    console.log("transformobj1", transform);
     var transformobj = { a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 };
     if (!transform) {
       transform = "matrix(1,0,0,1,0,0)";
@@ -1276,7 +1310,6 @@
         f: +translateReg[2],
       }
     }
-    console.log('transformobj', transformobj);
     return transformobj;
   }
 
