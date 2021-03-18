@@ -17,5 +17,5 @@ window.C2S_EXAMPLES['myclip'] = function (ctx) {
     ctx.restore();
 
     ctx.fillStyle = 'cyan';
-    ctx.fillRect(100, 0, 100, 100);    
+    ctx.fillRect(300, 0, 100, 100);    
 };
